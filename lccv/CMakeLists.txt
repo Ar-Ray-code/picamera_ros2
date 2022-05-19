@@ -2,21 +2,28 @@ cmake_minimum_required(VERSION 3.6)
 
 project(lccv)
 
-if (NOT EXISTS ${CMAKE_BINARY_DIR}/CMakeCache.txt)
-    if (NOT CMAKE_BUILD_TYPE)
-        set(CMAKE_BUILD_TYPE "Release" CACHE STRING "" FORCE)
-        message(STATUS "No previous build - default to Release build")
-    endif()
+# Default to C99
+if(NOT CMAKE_C_STANDARD)
+  set(CMAKE_C_STANDARD 99)
 endif()
 
-set (CMAKE_EXPORT_COMPILE_COMMANDS ON)
-set (CMAKE_CXX_STANDARD 17)
-add_compile_options(-Wall -Wextra -pedantic -Wno-unused-parameter -faligned-new -Werror -Wfatal-errors)
+# Default to C++17
+if(NOT CMAKE_CXX_STANDARD)
+  set(CMAKE_CXX_STANDARD 17)
+endif()
+
+if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  add_compile_options(-Wall -Wextra -Wpedantic)
+endif()
+
+# if (NOT EXISTS ${CMAKE_BINARY_DIR}/CMakeCache.txt)
+#     if (NOT CMAKE_BUILD_TYPE)
+#         set(CMAKE_BUILD_TYPE "Release" CACHE STRING "" FORCE)
+#         message(STATUS "No previous build - default to Release build")
+#     endif()
+# endif()
+
 add_definitions(-D_FILE_OFFSET_BITS=64)
-
-if (CMAKE_COMPILER_IS_GNUCXX)
-    add_compile_options(-Wno-psabi)
-endif()
 
 option(BUILD_SHARED_LIBS "Build using shared libraries" ON)
 
@@ -43,6 +50,10 @@ set(CPACK_SOURCE_PACKAGE_FILE_NAME "lccv-src")
 set(CPACK_SOURCE_IGNORE_FILES "/\.git*;/build;")
 include(CPack)
 
+find_package(ament_cmake REQUIRED)
+find_package(ament_cmake_auto REQUIRED)
+ament_auto_find_build_dependencies()
+
 find_package(PkgConfig REQUIRED)
 find_package(OpenCV REQUIRED)
 
@@ -66,15 +77,29 @@ set(HEADERS
     include/libcamera_app_options.hpp
 )
 
-add_library(liblccv ${SOURCES} ${HEADERS})
-
-set_target_properties(liblccv PROPERTIES PREFIX "" IMPORT_PREFIX "")
+# add_library(liblccv ${SOURCES} ${HEADERS})
+ament_auto_add_library(liblccv SHARED ${SOURCES} ${HEADERS})
 target_link_libraries(liblccv pthread ${LIBCAMERA_LINK_LIBRARIES} ${OpenCV_LIBS})
 
-install(TARGETS liblccv 
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} 
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+install(TARGETS liblccv
+  EXPORT export_${PROJECT_NAME}
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin
+  INCLUDES DESTINATION include
+)
+
+install(DIRECTORY
+  DESTINATION share/${PROJECT_NAME}
 )
 install(
-    FILES ${HEADERS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+  DIRECTORY include/
+  DESTINATION include
 )
+
+if(BUILD_TESTING)
+  find_package(ament_lint_auto REQUIRED)
+  ament_lint_auto_find_test_dependencies()
+endif()
+
+ament_package()
