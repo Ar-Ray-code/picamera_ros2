@@ -28,6 +28,24 @@ colcon build --symlink-install
 
 <br>
 
+## Topic
+
+### Publish
+
+- image_raw (sensor_msgs/msg/Image)
+
+<br>
+
+## Parameter
+
+- video_width: width of publishing image (Default: 1280)
+- video_height height of publishing image (Default: 720)
+- framerate: publishing rate (Default: 30)
+
+> Note: The actual frame rate may be lower than the set frame rate.
+
+<br>
+
 ## Context (by kbarni)
 
 In Raspbian Bullseye, the Raspberry Pi camera framework was completely rebased from MMAL to the libcamera library - thus breaking most of the previous camera dependencies.
