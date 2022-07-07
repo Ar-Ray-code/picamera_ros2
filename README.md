@@ -10,9 +10,10 @@ PiCamera wrapper using libcamera (RasPi-CSI2)
 - libcamera
 - [ROS2-Galactic](https://github.com/Ar-Ray-code/rpi-bullseye-ros2)
 - OpenCV4
+- libboost
 
 ```bash
-sudo apt install build-essential cmake git libcamera-dev libopencv-dev
+sudo apt install build-essential cmake git libcamera-dev libopencv-dev libdrm-dev libboost-dev libboost-program-options-dev
 ```
 
 <br>
