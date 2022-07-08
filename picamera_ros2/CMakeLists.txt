@@ -20,12 +20,12 @@ include_directories(include ${LIBCAMERA_INCLUDE_DIRS})
 set(TARGET picamera_pub)
 ament_auto_add_library(${TARGET} SHARED src/${TARGET}.cpp)
 rclcpp_components_register_nodes(${TARGET} "picamera_ros::PiCameraROS")
-target_link_libraries(${TARGET} -llccv)
+# target_link_libraries(${TARGET} -llccv)
 # ===================================================================
 
 # picamera_pub_exec ======================================
 ament_auto_add_executable(${TARGET}_exec src/${TARGET}.cpp)
-target_link_libraries(${TARGET}_exec -llccv)
+# target_link_libraries(${TARGET}_exec -llccv)
 # ===================================================================
 
 install(DIRECTORY
