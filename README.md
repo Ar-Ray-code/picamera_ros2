@@ -8,7 +8,7 @@ PiCamera wrapper using libcamera (RasPi-CSI2)
 
 - Raspberry Pi Bullseye (32bit)
 - libcamera
-- [ROS2-Galactic](https://github.com/Ar-Ray-code/rpi-bullseye-ros2)
+- [ROS2-Humble](https://github.com/Ar-Ray-code/rpi-bullseye-ros2)
 - OpenCV4
 - libboost
 
