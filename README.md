@@ -16,6 +16,10 @@ PiCamera wrapper using libcamera (RasPi-CSI2)
 sudo apt install build-essential cmake git libcamera-dev libopencv-dev libdrm-dev libboost-dev libboost-program-options-dev
 ```
 
+### building libcamera
+
+[URL](https://www.raspberrypi.com/documentation/accessories/camera.html#building-libcamera)
+
 <br>
 
 ## Usage
