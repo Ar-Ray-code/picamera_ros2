@@ -1,3 +1,5 @@
+
+```cmake
 project(takephoto)
 cmake_minimum_required(VERSION 3.0.0)
 
@@ -13,3 +15,4 @@ add_executable(takevideo takevideo.cpp)
 
 target_link_libraries(takephoto -llccv ${OpenCV_LIBS})
 target_link_libraries(takevideo -llccv ${OpenCV_LIBS})
+```
