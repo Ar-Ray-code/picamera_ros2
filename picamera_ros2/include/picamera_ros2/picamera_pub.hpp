@@ -31,8 +31,6 @@ private:
 
     rclcpp::TimerBase::SharedPtr timer_;
     rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr image_pub_;
-    // rclcpp::Publisher<sensor_msgs::msg::CameraInfo>::SharedPtr info_pub_;
-    // image_transport::ImageTransport it_;
 };
 
 }
