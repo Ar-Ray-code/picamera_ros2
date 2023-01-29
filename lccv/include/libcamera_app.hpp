@@ -262,6 +262,7 @@ struct FrameInfo
 	float focus;
 	float fps;
 	bool aelock;
+	bool hdr;
 
 private:
 	// Info text tokens.

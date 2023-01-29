@@ -96,6 +96,25 @@ bool PiCamera::capturePhoto(cv::Mat &frame)
     return true;
 }
 
+bool PiCamera::hdrOpen(bool _hdr_flag)
+{
+    bool ok = false;
+    for (int i = 0; i < 4 && !ok; i++)
+    {
+        std::string dev("/dev/v4l-subdev");
+        dev += (char)('0' + i);
+        int fd = open(dev.c_str(), O_RDWR, 0);
+        if (fd < 0)
+            continue;
+
+        v4l2_control ctrl { V4L2_CID_WIDE_DYNAMIC_RANGE, _hdr_flag };
+        ok = !xioctl(fd, VIDIOC_S_CTRL, &ctrl);
+        close(fd);
+    }
+
+    return ok;
+}
+
 bool PiCamera::startVideo()
 {
     if(camerastarted)stopPhoto();

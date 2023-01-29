@@ -28,6 +28,7 @@ private:
     int video_height_;
     int framerate_;
     bool verbose_;
+    bool hdr_;
 
     rclcpp::TimerBase::SharedPtr timer_;
     rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr image_pub_;
