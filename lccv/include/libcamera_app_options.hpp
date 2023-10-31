@@ -61,7 +61,7 @@ public:
 	awb_gain_r=awb_gain_b=0;
         denoise="auto";
         verbose=false;
-	transform=libcamera::Transform::Identity;
+	orientation=libcamera::Orientation::Identity;
 	camera=0;
 	}
 
