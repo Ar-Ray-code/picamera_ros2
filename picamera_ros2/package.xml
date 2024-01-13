@@ -14,8 +14,8 @@
   <depend>cv_bridge</depend>
   <depend>rclcpp</depend>
   <depend>sensor_msgs</depend>
-  <depend>imaage_transport</depend>
-  <depend>OpenCV</depend>
+  <!-- <depend>imaage_transport</depend> -->
+  <depend>python3-opencv</depend>
   <depend>lccv</depend>
   <depend>rclcpp_components</depend>
 

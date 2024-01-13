@@ -15,7 +15,7 @@ void Options::Print() const
 	std::cerr << "    photo resolution: " << photo_width << " x "<< photo_height << std::endl;
 	std::cerr << "    video resolution: " << video_width << " x " << video_height << std::endl;
 	std::cerr << "    rawfull: " << rawfull << std::endl;
-	std::cerr << "    transform: " << transformToString(transform) << std::endl;
+	// std::cerr << "    transform: " << transformToString(transform) << std::endl;
 	if (roi_width == 0 || roi_height == 0)
 		std::cerr << "    roi: all" << std::endl;
 	else

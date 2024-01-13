@@ -14,7 +14,7 @@
 #include <libcamera/camera_manager.h>
 #include <libcamera/control_ids.h>
 #include <libcamera/property_ids.h>
-#include <libcamera/transform.h>
+#include <libcamera/orientation.h>
 
 enum Exposure_Modes {
     EXPOSURE_NORMAL = libcamera::controls::ExposureNormal,
@@ -61,7 +61,7 @@ public:
 	awb_gain_r=awb_gain_b=0;
         denoise="auto";
         verbose=false;
-	transform=libcamera::Transform::Identity;
+	orientation=libcamera::Orientation::Rotate0;
 	camera=0;
 	}
 
@@ -85,7 +85,7 @@ public:
     unsigned int photo_width, photo_height;
     unsigned int video_width, video_height;
 	bool rawfull;
-	libcamera::Transform transform;
+	libcamera::Orientation orientation;
 	float roi_x, roi_y, roi_width, roi_height;
 	float shutter;
 	float gain;
