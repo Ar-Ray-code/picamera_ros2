@@ -6,9 +6,9 @@ PiCamera wrapper using libcamera (RasPi-CSI2)
 
 ## Depends (Development environment)
 
-- Raspberry Pi Bullseye (64bit)
-- libcamera-dev `sudo apt install libcamera-dev`
-- [ROS2-Humble](https://github.com/Ar-Ray-code/rpi-bullseye-ros2)
+- Raspberry Pi Bookworm (64bit)
+- [libcamera-dev 0.1.0](https://github.com/raspberrypi/libcamera) `sudo apt install libcamera-dev`
+- [ROS2-Iron](https://github.com/Ar-Ray-code/rpi-bullseye-ros2)
 - OpenCV4
 - libboost
 
