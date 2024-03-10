@@ -12,17 +12,20 @@ PiCameraROS::PiCameraROS(const rclcpp::NodeOptions &options_): Node("picamera_ro
     this->declare_parameter("framerate", 30);
     this->declare_parameter("hdr", true);
     this->declare_parameter("verbose", false);
+    this->declare_parameter("shutter", 100.0);
 
     this->get_parameter("video_width", this->video_width_);
     this->get_parameter("video_height", this->video_height_);
     this->get_parameter("framerate", this->framerate_);
     this->get_parameter("hdr", this->hdr_);
     this->get_parameter("verbose", this->verbose_);
+    this->get_parameter("shutter", this->shutter_);
 
     this->camera_->options->video_width = this->video_width_;
     this->camera_->options->video_height = this->video_height_;
     this->camera_->options->framerate = this->framerate_;
     this->camera_->options->verbose = this->verbose_;
+    this->camera_->options->shutter = this->shutter_;
 
     this->camera_->hdrOpen(this->hdr_);
     this->camera_->startVideo();

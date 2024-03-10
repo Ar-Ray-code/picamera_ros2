@@ -26,6 +26,11 @@ def generate_launch_description():
             default_value="30",
             description="Framerate of the video stream."
         ),
+        DeclareLaunchArgument(
+            "shutter",
+            default_value="100.0",
+            description="Shutter speed of the camera in milliseconds."
+        ),
     ]
 
     container = ComposableNodeContainer(
