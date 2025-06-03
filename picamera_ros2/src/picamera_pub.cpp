@@ -54,6 +54,7 @@ PiCameraROS::PiCameraROS(const rclcpp::NodeOptions &options_): Node("picamera_ro
     this->camera_->options->brightness = this->params_.brightness;
     this->camera_->options->saturation = this->params_.saturation;
     this->camera_->options->ev = this->params_.ev;
+    this->camera_->options->lens_position = this->params_.lens_position;
     this->camera_->options->sharpness = this->params_.sharpness;
     this->camera_->options->contrast = this->params_.contrast;
     this->camera_->options->framerate = this->params_.framerate;

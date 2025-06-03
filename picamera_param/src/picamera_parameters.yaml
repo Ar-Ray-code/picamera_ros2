@@ -71,8 +71,8 @@ picamera_parameters:
     }
   afmode:
     type: string
-    description: "Specifies the autofocus mode.:"
-    default_value: "continuous"
+    description: "Specifies the autofocus mode. (Currently only manual)"
+    default_value: "manual"
     validation: {
       one_of<>: [["default", "manual", "auto", "continuous"]]
     }
@@ -90,13 +90,13 @@ picamera_parameters:
     validation: {
       one_of<>: [["normal", "fast"]]
     }
-  # lens_position:
-  #   type: double
-  #   description: "Moves the lens to a fixed focal distance, normally given in dioptres (units of 1 / distance in metres)."
-  #   default_value: 0.0
-  #   validation: {
-  #       bounds<>: [0.0, 100.0]
-  #   }
+  lens_position:
+    type: double
+    description: "Moves the lens to a fixed focal distance, normally given in dioptres (units of 1 / distance in metres)."
+    default_value: 10.0
+    validation: {
+        bounds<>: [0.0, 100.0]
+    }
   hdr:
     type: bool
     description: "Enables or disables High Dynamic Range (HDR) mode."

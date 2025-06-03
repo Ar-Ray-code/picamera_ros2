@@ -213,20 +213,28 @@ void LibcameraApp::StartCamera()
 		controls_.set(controls::AeMeteringMode, options_->getMeteringMode());
 	if (!controls_.get(controls::AeExposureMode))
 		controls_.set(controls::AeExposureMode, options_->getExposureMode());
-	if (!controls_.get(controls::ExposureValue))
-		controls_.set(controls::ExposureValue, options_->ev);
 	if (!controls_.get(controls::AwbMode))
 		controls_.set(controls::AwbMode, options_->getWhiteBalance());
 	if (!controls_.get(controls::ColourGains) && options_->awb_gain_r && options_->awb_gain_b)
 		controls_.set(controls::ColourGains, libcamera::Span<const float, 2>({ options_->awb_gain_r, options_->awb_gain_b }));
-	if (!controls_.get(controls::Brightness))
-		controls_.set(controls::Brightness, options_->brightness);
-	if (!controls_.get(controls::Contrast))
-		controls_.set(controls::Contrast, options_->contrast);
-	if (!controls_.get(controls::Saturation))
-		controls_.set(controls::Saturation, options_->saturation);
+	if (!controls_.get(controls::AfMode))
+		controls_.set(controls::AfMode, options_->getAfMode());
+	if (!controls_.get(controls::AfRange))
+		controls_.set(controls::AfRange, options_->getAfRange());
+	if (!controls_.get(controls::AfSpeed))
+		controls_.set(controls::AfSpeed, options_->getAfSpeed());
+	if (!controls_.get(controls::LensPosition) && options_->lens_position)
+		controls_.set(controls::LensPosition, options_->lens_position);
 	if (!controls_.get(controls::Sharpness))
 		controls_.set(controls::Sharpness, options_->sharpness);
+	if (!controls_.get(controls::Saturation))
+		controls_.set(controls::Saturation, options_->saturation);
+	if (!controls_.get(controls::Contrast))
+		controls_.set(controls::Contrast, options_->contrast);
+	if (!controls_.get(controls::Brightness))
+		controls_.set(controls::Brightness, options_->brightness);
+	if (!controls_.get(controls::ExposureValue))
+		controls_.set(controls::ExposureValue, options_->ev);
 
 	if (camera_->start(&controls_))
 		throw std::runtime_error("failed to start camera");

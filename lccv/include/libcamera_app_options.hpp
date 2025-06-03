@@ -79,6 +79,11 @@ public:
         shutter=0.0f;
         gain=0.0f;
         ev=0.0f;
+        photo_width=video_width=640;
+        photo_height=video_height=480;
+        rawfull=false;
+        info_text="";
+        lens_position=0.0f;
         roi_x=roi_y=roi_width=roi_height=0;
         awb_gain_r=awb_gain_b=0;
         denoise="auto";
@@ -125,6 +130,7 @@ public:
 	float saturation;
 	float sharpness;
 	float framerate;
+    float lens_position;
 	std::string denoise;
 	std::string info_text;
 	unsigned int camera;
