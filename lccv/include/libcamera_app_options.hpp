@@ -41,6 +41,25 @@ enum WhiteBalance_Modes {
     WB_CUSTOM = libcamera::controls::AwbAuto
 };
 
+enum AfMode_Modes {
+	AF_MODE_DEFAULT = -1,
+	AF_MODE_MANUAL = libcamera::controls::AfModeManual,
+	AF_MODE_AUTO = libcamera::controls::AfModeAuto,
+	AF_MODE_CONTINUOUS = libcamera::controls::AfModeContinuous
+};
+
+enum AfRange_Modes {
+	AF_RANGE_NORMAL = libcamera::controls::AfRangeNormal,
+	AF_RANGE_MACRO = libcamera::controls::AfRangeMacro,
+	AF_RANGE_FULL = libcamera::controls::AfRangeFull
+};
+
+enum AfSpeed_Modes {
+    AF_SPEED_NORMAL = libcamera::controls::AfSpeedNormal,
+    AF_SPEED_FAST = libcamera::controls::AfSpeedFast
+};
+
+
 class Options
 {
 public:
@@ -50,20 +69,23 @@ public:
         metering_index = Metering_Modes::METERING_CENTRE;
         exposure_index=Exposure_Modes::EXPOSURE_NORMAL;
         awb_index=WhiteBalance_Modes::WB_AUTO;
+        afmode_index=AfMode_Modes::AF_MODE_AUTO;
+        afrange_index=AfRange_Modes::AF_RANGE_NORMAL;
+        afspeed_index=AF_SPEED_NORMAL;
         saturation=1.0f;
         contrast=1.0f;
         sharpness=1.0f;
-	brightness=0.0f;
-	shutter=0.0f;
-	gain=0.0f;
-	ev=0.0f;
-	roi_x=roi_y=roi_width=roi_height=0;
-	awb_gain_r=awb_gain_b=0;
+        brightness=0.0f;
+        shutter=0.0f;
+        gain=0.0f;
+        ev=0.0f;
+        roi_x=roi_y=roi_width=roi_height=0;
+        awb_gain_r=awb_gain_b=0;
         denoise="auto";
         verbose=false;
-	orientation=libcamera::Orientation::Rotate0;
-	camera=0;
-	}
+        orientation=libcamera::Orientation::Rotate0;
+        camera=0;
+    }
 
 	virtual ~Options() {}
 
@@ -72,10 +94,16 @@ public:
     void setMetering(Metering_Modes meteringmode){metering_index=meteringmode;}
     void setWhiteBalance(WhiteBalance_Modes wb){awb_index = wb;}
     void setExposureMode(Exposure_Modes exp){exposure_index = exp;}
+	void setAfMode(AfMode_Modes afm){afmode_index = afm;}
+    void setAfRange(AfRange_Modes afr){afrange_index = afr;}
+    void setAfSpeed(AfSpeed_Modes afs){afspeed_index = afs;}
 
     int getExposureMode(){return exposure_index;}
     int getMeteringMode(){return metering_index;}
     int getWhiteBalance(){return awb_index;}
+    int getAfMode(){return afmode_index;}
+    int getAfRange(){return afrange_index;}
+    int getAfSpeed(){return afspeed_index;}
 
 	bool help;
 	bool version;
@@ -86,7 +114,7 @@ public:
     unsigned int video_width, video_height;
 	bool rawfull;
 	libcamera::Orientation orientation;
-	float roi_x, roi_y, roi_width, roi_height;
+	float roi_x, roi_y, roi_width, roi_height = 0;
 	float shutter;
 	float gain;
 	float ev;
@@ -105,6 +133,9 @@ protected:
 	int metering_index;
 	int exposure_index;
     int awb_index;
+	int afmode_index;
+	int afrange_index;
+    int afspeed_index;
 
 private:
 };

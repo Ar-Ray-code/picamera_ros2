@@ -11,12 +11,12 @@ PiCameraROS::PiCameraROS(const rclcpp::NodeOptions &options_): Node("picamera_ro
         this->get_node_parameters_interface());
     this->params_ = param_listener_->get_params();
 
-    std::map<std::string, int> exposure_map =
+    std::map<std::string, int> exposure_table =
 		{ { "normal", libcamera::controls::ExposureNormal },
         { "sport", libcamera::controls::ExposureShort },
         { "long", libcamera::controls::ExposureLong },
         { "custom", libcamera::controls::ExposureCustom } };
-    std::map<std::string, int> awb_map =
+    std::map<std::string, int> awb_table =
         { { "auto", libcamera::controls::AwbAuto },
         { "incandescent", libcamera::controls::AwbIncandescent },
         { "tungsten", libcamera::controls::AwbTungsten },
@@ -31,6 +31,18 @@ PiCameraROS::PiCameraROS(const rclcpp::NodeOptions &options_): Node("picamera_ro
         { "average", libcamera::controls::MeteringMatrix },
         { "matrix", libcamera::controls::MeteringMatrix },
         { "custom", libcamera::controls::MeteringCustom } };
+	std::map<std::string, int> afMode_table =
+		{ { "default", -1 },
+        { "manual", libcamera::controls::AfModeManual },
+        { "auto", libcamera::controls::AfModeAuto },
+        { "continuous", libcamera::controls::AfModeContinuous } };
+	std::map<std::string, int> afRange_table =
+        { { "normal", libcamera::controls::AfRangeNormal },
+        { "macro", libcamera::controls::AfRangeMacro },
+        { "full", libcamera::controls::AfRangeFull } };
+    std::map<std::string, int> afSpeed_table =
+        { { "normal", libcamera::controls::AfSpeedNormal },
+        { "fast", libcamera::controls::AfSpeedFast } };
 
     this->camera_->options->video_width = this->params_.video_width;
     this->camera_->options->video_height = this->params_.video_height;
@@ -45,13 +57,12 @@ PiCameraROS::PiCameraROS(const rclcpp::NodeOptions &options_): Node("picamera_ro
     this->camera_->options->sharpness = this->params_.sharpness;
     this->camera_->options->contrast = this->params_.contrast;
     this->camera_->options->framerate = this->params_.framerate;
-    this->camera_->options->roi_x = this->params_.autofocus_range.x;
-    this->camera_->options->roi_y = this->params_.autofocus_range.y;
-    this->camera_->options->roi_width = this->params_.autofocus_range.width;
-    this->camera_->options->roi_height = this->params_.autofocus_range.height;
     this->camera_->options->setMetering(static_cast<Metering_Modes>(metering_table[this->params_.metering]));
-    this->camera_->options->setExposureMode(static_cast<Exposure_Modes>(exposure_map[this->params_.exposure]));
-    this->camera_->options->setWhiteBalance(static_cast<WhiteBalance_Modes>(awb_map[this->params_.awb]));
+    this->camera_->options->setExposureMode(static_cast<Exposure_Modes>(exposure_table[this->params_.exposure]));
+    this->camera_->options->setWhiteBalance(static_cast<WhiteBalance_Modes>(awb_table[this->params_.awb]));
+    this->camera_->options->setAfMode(static_cast<AfMode_Modes>(afMode_table[this->params_.afmode]));
+    this->camera_->options->setAfRange(static_cast<AfRange_Modes>(afRange_table[this->params_.afrange]));
+    this->camera_->options->setAfSpeed(static_cast<AfSpeed_Modes>(afSpeed_table[this->params_.afspeed]));
 
     this->camera_->options->framerate = (float)this->params_.framerate;
 
@@ -70,14 +81,39 @@ PiCameraROS::~PiCameraROS()
 void PiCameraROS::timerCallback()
 {
     sensor_msgs::msg::Image image_msg;
-    cv_bridge::CvImage cv_image;
     cv::Mat image;
 
-    cv_image.encoding = sensor_msgs::image_encodings::BGR8;
     this->camera_->getVideoFrame(image, 1000);
-    cv_image.image = image;
-    cv_image.toImageMsg(image_msg);
+    if (image.empty()) {
+        RCLCPP_ERROR(this->get_logger(), "Failed to capture image from camera.");
+        return;
+    }
+    
+    // Convert OpenCV Mat to ROS Image message
+    matToImageMsg(image, image_msg, sensor_msgs::image_encodings::BGR8);
     image_pub_->publish(image_msg);
+}
+
+void PiCameraROS::matToImageMsg(const cv::Mat& image, sensor_msgs::msg::Image& ros_image, const std::string& encoding)
+{
+    ros_image.header.stamp = this->now();
+    ros_image.header.frame_id = "camera";  // Add frame_id for proper TF integration
+    ros_image.height = image.rows;
+    ros_image.width = image.cols;
+    ros_image.encoding = encoding;
+    ros_image.is_bigendian = false;  // Most systems are little-endian
+    ros_image.step = image.cols * image.elemSize();
+    size_t size = ros_image.step * image.rows;
+    ros_image.data.resize(size);
+
+    if (image.isContinuous()) {
+        memcpy(ros_image.data.data(), image.data, size);
+    } else {
+        // Copy by row by row for non-continuous images
+        for (int i = 0; i < image.rows; ++i) {
+            memcpy(ros_image.data.data() + i * ros_image.step, image.ptr(i), ros_image.step);
+        }
+    }
 }
 
 }

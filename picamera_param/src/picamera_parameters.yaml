@@ -69,56 +69,27 @@ picamera_parameters:
     validation: {
       one_of<>: [["auto", "off", "cdn_off", "cdn_fast", "cdn_hq"]]
     }
-  # autofocus_mode:
-  #   type: string
-  #   description: "Specifies the autofocus mode.:"
-  #   default_value: "default"
-  #   validation: {
-  #     one_of<>: [["default", "manual", "auto", "continuous"]]
-  #   }
-  # autofocus_range:
-  #   type: string
-  #   description: "Specifies the autofocus range.:"
-  #   default_value: "normal"
-  #   validation: {
-  #     one_of<>: [["normal", "macro", "full"]]
-  #   }
-  # autofocus_speed:
-  #   type: string
-  #   description: "Specifies the autofocus speed.:"
-  #   default_value: "normal"
-  #   validation: {
-  #     one_of<>: [["normal", "fast"]]
-  #   }
-  autofocus_range:
-    x:
-      type: double
-      description: "Specifies the autofocus window within the full field of the sensor (x);"
-      default_value: 0.0
-      validation: {
-          bounds<>: [0.0, 1.0]
-      }
-    y:
-      type: double
-      description: "Specifies the autofocus window within the full field of the sensor (y);"
-      default_value: 0.0
-      validation: {
-          bounds<>: [0.0, 1.0]
-      }
-    width:
-      type: double
-      description: "Specifies the autofocus window within the full field of the sensor (width);"
-      default_value: 1.0
-      validation: {
-          bounds<>: [0.0, 1.0]
-      }
-    height:
-      type: double
-      description: "Specifies the autofocus window within the full field of the sensor (height);"
-      default_value: 1.0
-      validation: {
-          bounds<>: [0.0, 1.0]
-      }
+  afmode:
+    type: string
+    description: "Specifies the autofocus mode.:"
+    default_value: "continuous"
+    validation: {
+      one_of<>: [["default", "manual", "auto", "continuous"]]
+    }
+  afrange:
+    type: string
+    description: "Specifies the autofocus range.:"
+    default_value: "normal"
+    validation: {
+      one_of<>: [["normal", "macro", "full"]]
+    }
+  afspeed:
+    type: string
+    description: "Specifies the autofocus speed.:"
+    default_value: "normal"
+    validation: {
+      one_of<>: [["normal", "fast"]]
+    }
   # lens_position:
   #   type: double
   #   description: "Moves the lens to a fixed focal distance, normally given in dioptres (units of 1 / distance in metres)."

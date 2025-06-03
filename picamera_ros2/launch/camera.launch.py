@@ -13,12 +13,12 @@ def generate_launch_description():
     launch_args = [
         DeclareLaunchArgument(
             "video_width",
-            default_value="1280",
+            default_value="1352",
             description="Width of the video stream."
         ),
         DeclareLaunchArgument(
             "video_height",
-            default_value="720",
+            default_value="1013",
             description="Height of the video stream."
         ),
         DeclareLaunchArgument(
@@ -31,6 +31,11 @@ def generate_launch_description():
             default_value="100.0",
             description="Shutter speed of the camera in milliseconds."
         ),
+        DeclareLaunchArgument(
+            "hdr",
+            default_value="false",
+            description="Enable HDR mode for the camera."
+        )
     ]
 
     container = ComposableNodeContainer(
@@ -47,6 +52,7 @@ def generate_launch_description():
                     'video_width': LaunchConfiguration('video_width'),
                     'video_height': LaunchConfiguration('video_height'),
                     'framerate': LaunchConfiguration('framerate'),
+                    'hdr': LaunchConfiguration('hdr'),
                 }]
             ),
         ],

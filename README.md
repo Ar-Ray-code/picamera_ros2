@@ -13,7 +13,7 @@ PiCamera wrapper using libcamera (RasPi-CSI2)
 - libboost
 
 ```bash
-sudo apt install build-essential cmake git libcamera-dev libopencv-dev libdrm-dev libboost-dev libboost-program-options-dev
+sudo apt install build-essential cmake git libcamera-dev libopencv-dev libdrm-dev libboost-dev libboost-program-options-dev python3-typeguard
 ```
 
 ### building libcamera
@@ -25,7 +25,7 @@ sudo apt install build-essential cmake git libcamera-dev libopencv-dev libdrm-de
 ## Usage
 
 ```bash
-source /opt/ros/galactic/setup.bash
+source /opt/ros/jazzy/setup.bash
 git clone https://github.com/Ar-Ray-code/picamera_ros2.git ~/ros2_ws/src
 cd ~/ros2_ws
 colcon build --symlink-install

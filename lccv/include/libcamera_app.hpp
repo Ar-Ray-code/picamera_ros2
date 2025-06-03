@@ -211,9 +211,10 @@ struct FrameInfo
 		if (fom)
 			focus = *fom;
 
-		auto ae = ctrls.get(libcamera::controls::AeLocked);
-		if (ae)
-			aelock = *ae;
+		auto ae_state = ctrls.get(libcamera::controls::AeState);
+		// Note: AeLocked was removed. ref: https://patchwork.libcamera.org/patch/22517/
+		if (ae_state)
+			aelock = (*ae_state == libcamera::controls::AeStateConverged);
 	}
 
 	std::string ToString(std::string &info_string) const

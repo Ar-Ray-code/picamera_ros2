@@ -16,8 +16,12 @@ ament_auto_find_build_dependencies()
 pkg_check_modules(LIBCAMERA REQUIRED libcamera)
 include_directories(include ${LIBCAMERA_INCLUDE_DIRS})
 
+# Make sure to find OpenCV package
+find_package(OpenCV REQUIRED)
+
 # picamera_pub ======================================
 set(TARGET picamera_pub)
+add_compile_options(-I/usr/include/opencv4)
 ament_auto_add_library(${TARGET} SHARED src/${TARGET}.cpp)
 rclcpp_components_register_nodes(${TARGET} "picamera_ros::PiCameraROS")
 # target_link_libraries(${TARGET} -llccv)
@@ -25,8 +29,27 @@ rclcpp_components_register_nodes(${TARGET} "picamera_ros::PiCameraROS")
 
 # picamera_pub_exec ======================================
 ament_auto_add_executable(${TARGET}_exec src/${TARGET}.cpp)
+target_link_libraries(${TARGET}_exec
+  ${OpenCV_LIBRARIES}
+  # ...existing libraries...
+)
 # target_link_libraries(${TARGET}_exec -llccv)
 # ===================================================================
+
+# When setting up target links, ensure OpenCV is included
+if(TARGET picamera_pub)
+  target_link_libraries(picamera_pub
+    ${OpenCV_LIBRARIES}
+    # ...existing libraries...
+  )
+endif()
+
+# Also update include directories if needed
+target_include_directories(picamera_pub_exec PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>
+  ${OpenCV_INCLUDE_DIRS}
+)
 
 install(DIRECTORY
   launch

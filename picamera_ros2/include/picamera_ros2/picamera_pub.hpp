@@ -6,8 +6,7 @@
 
 #include <rclcpp/rclcpp.hpp>
 #include <sensor_msgs/msg/image.hpp>
-// #include <image_transport/image_transport.h>
-#include <cv_bridge/cv_bridge.hpp>
+#include <sensor_msgs/image_encodings.hpp>
 #include <rclcpp_components/register_node_macro.hpp>
 #include <picamera_param/picamera_param.hpp>
 
@@ -22,6 +21,7 @@ public:
     ~PiCameraROS();
 
     void timerCallback();
+    void matToImageMsg(const cv::Mat& image, sensor_msgs::msg::Image& ros_image, const std::string& encoding);
 
 private:
     PiCamera *camera_;

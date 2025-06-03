@@ -16,13 +16,6 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
-# if (NOT EXISTS ${CMAKE_BINARY_DIR}/CMakeCache.txt)
-#     if (NOT CMAKE_BUILD_TYPE)
-#         set(CMAKE_BUILD_TYPE "Release" CACHE STRING "" FORCE)
-#         message(STATUS "No previous build - default to Release build")
-#     endif()
-# endif()
-
 add_definitions(-D_FILE_OFFSET_BITS=64)
 
 option(BUILD_SHARED_LIBS "Build using shared libraries" ON)
@@ -62,7 +55,9 @@ message(STATUS "libcamera library found:")
 message(STATUS "    version: ${LIBCAMERA_VERSION}")
 message(STATUS "    libraries: ${LIBCAMERA_LINK_LIBRARIES}")
 message(STATUS "    include path: ${LIBCAMERA_INCLUDE_DIRS}")
-include_directories(include ${LIBCAMERA_INCLUDE_DIRS} ${OPENCV_INCLUDE_DIRS})
+include_directories(include ${LIBCAMERA_INCLUDE_DIRS} ${OPENCV_INCLUDE_DIRS} /usr/include/opencv4)
+
+add_compile_options(-I/usr/include/opencv4)
 
 include(GNUInstallDirs)
 
@@ -77,7 +72,6 @@ set(HEADERS
     include/libcamera_app_options.hpp
 )
 
-# add_library(liblccv ${SOURCES} ${HEADERS})
 ament_auto_add_library(liblccv SHARED ${SOURCES} ${HEADERS})
 target_link_libraries(liblccv pthread ${LIBCAMERA_LINK_LIBRARIES} ${OpenCV_LIBS})
 
