@@ -26,9 +26,10 @@ sudo apt install build-essential cmake git libcamera-dev libopencv-dev libdrm-de
 
 ```bash
 source /opt/ros/jazzy/setup.bash
-git clone https://github.com/Ar-Ray-code/picamera_ros2.git ~/ros2_ws/src
+git clone https://github.com/Ar-Ray-code/picamera_ros2.git ~/ros2_ws/src/picamera_ros2
 cd ~/ros2_ws
-colcon build --symlink-install
+vcs import ./src < ./src/picamera_ros2/generate_parameter_library.repos
+colcon build
 ```
 
 <br>
