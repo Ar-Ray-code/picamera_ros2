@@ -7,8 +7,8 @@ PiCamera wrapper using libcamera (RasPi-CSI2)
 ## Depends (Development environment)
 
 - Raspberry Pi Bookworm (64bit)
-- [libcamera-dev 0.1.0](https://github.com/raspberrypi/libcamera) `sudo apt install libcamera-dev`
-- [ROS2-Iron](https://github.com/Ar-Ray-code/rpi-bullseye-ros2)
+- [libcamera-dev 0.5.0](https://github.com/raspberrypi/libcamera) `sudo apt install libcamera-dev`
+- [ROS2-Jazzy](https://github.com/Ar-Ray-code/rpi-bullseye-ros2)
 - OpenCV4
 - libboost
 
@@ -43,11 +43,7 @@ colcon build --symlink-install
 
 ## Parameter
 
-- video_width: width of publishing image (Default: 1280)
-- video_height height of publishing image (Default: 720)
-- framerate: publishing rate (Default: 30)
-
-> Note: The actual frame rate may be lower than the set frame rate.
+- [picamera_parameters.yaml](picamera_param/src/picamera_parameters.yaml),
 
 <br>
 
