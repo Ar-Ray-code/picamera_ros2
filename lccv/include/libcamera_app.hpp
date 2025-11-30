@@ -22,6 +22,9 @@
 #include <map>
 #include <iomanip>
 
+#include <unordered_map>
+#include "timesync.hpp"
+
 #include <libcamera/base/span.h>
 #include <libcamera/camera.h>
 #include <libcamera/camera_manager.h>
@@ -75,15 +78,15 @@ public:
 
 	// Some flags that can be used to give hints to the camera configuration.
 	static constexpr unsigned int FLAG_STILL_NONE = 0;
-	static constexpr unsigned int FLAG_STILL_BGR = 1; // supply BGR images, not YUV
-	static constexpr unsigned int FLAG_STILL_RGB = 2; // supply RGB images, not YUV
-	static constexpr unsigned int FLAG_STILL_RAW = 4; // request raw image stream
-	static constexpr unsigned int FLAG_STILL_DOUBLE_BUFFER = 8; // double-buffer stream
+	static constexpr unsigned int FLAG_STILL_BGR = 1;			 // supply BGR images, not YUV
+	static constexpr unsigned int FLAG_STILL_RGB = 2;			 // supply RGB images, not YUV
+	static constexpr unsigned int FLAG_STILL_RAW = 4;			 // request raw image stream
+	static constexpr unsigned int FLAG_STILL_DOUBLE_BUFFER = 8;	 // double-buffer stream
 	static constexpr unsigned int FLAG_STILL_TRIPLE_BUFFER = 16; // triple-buffer stream
-	static constexpr unsigned int FLAG_STILL_BUFFER_MASK = 24; // mask for buffer flags
+	static constexpr unsigned int FLAG_STILL_BUFFER_MASK = 24;	 // mask for buffer flags
 
 	static constexpr unsigned int FLAG_VIDEO_NONE = 0;
-	static constexpr unsigned int FLAG_VIDEO_RAW = 1; // request raw image stream
+	static constexpr unsigned int FLAG_VIDEO_RAW = 1;			   // request raw image stream
 	static constexpr unsigned int FLAG_VIDEO_JPEG_COLOURSPACE = 2; // force JPEG colour space
 
 	LibcameraApp(std::unique_ptr<Options> const opts = nullptr);
@@ -96,7 +99,7 @@ public:
 	void CloseCamera();
 
 	void ConfigureStill(unsigned int flags = FLAG_STILL_NONE);
-    void ConfigureViewfinder();
+	void ConfigureViewfinder();
 
 	void Teardown();
 	void StartCamera();
@@ -120,6 +123,39 @@ public:
 	void SetControls(ControlList &controls);
 	void StreamDimensions(Stream const *stream, unsigned int *w, unsigned int *h, unsigned int *stride) const;
 
+	void EnableSoftwareTimeSync(bool en) { sw_timesync_enabled_ = en; }
+	bool TimeSyncReady() const { return sync_.ready(); }
+	double TimeSyncOffsetMs() const { return sync_.offset_ns() * 1e-6; }
+	double TimeSyncJitterMadMs() const { return sync_.median_abs_dev() * 1e-6; }
+	void SetSyncAlpha(double a)
+	{
+		TimeSyncConfig c = cfg_;
+		c.alpha = a;
+		sync_.configure(c);
+		cfg_ = c;
+	}
+	void SetSyncWarmup(int n)
+	{
+		TimeSyncConfig c = cfg_;
+		c.warmup_frames = n;
+		sync_.configure(c);
+		cfg_ = c;
+	}
+	void SetSyncReadyThresholdMs(double ms)
+	{
+		TimeSyncConfig c = cfg_;
+		c.ready_threshold_ns = ms * 1e6;
+		sync_.configure(c);
+		cfg_ = c;
+	}
+	void SetSyncWindow(int w)
+	{
+		TimeSyncConfig c = cfg_;
+		c.window = w;
+		sync_.configure(c);
+		cfg_ = c;
+	}
+
 protected:
 	std::unique_ptr<Options> options_;
 
@@ -138,7 +174,8 @@ private:
 		T Wait()
 		{
 			std::unique_lock<std::mutex> lock(mutex_);
-			cond_.wait(lock, [this] { return !queue_.empty(); });
+			cond_.wait(lock, [this]
+					   { return !queue_.empty(); });
 			T msg = std::move(queue_.front());
 			queue_.pop();
 			return msg;
@@ -182,14 +219,20 @@ private:
 	// Other:
 	uint64_t last_timestamp_;
 	uint64_t sequence_ = 0;
+
+	// --- Software timesync state ---
+	bool sw_timesync_enabled_ = true;
+	TimeSyncConfig cfg_{};
+	TimeSyncEstimator sync_;
+	std::unordered_map<Request *, int64_t> host_queue_ns_; // Hq per Request*
 };
 
 struct FrameInfo
 {
 	FrameInfo(libcamera::ControlList &ctrls)
-		: exposure_time(0.0), digital_gain(0.0), colour_gains({ { 0.0f, 0.0f } }), focus(0.0), aelock(false)
+		: exposure_time(0.0), digital_gain(0.0), colour_gains({{0.0f, 0.0f}}), focus(0.0), aelock(false)
 	{
-        auto exp = ctrls.get(libcamera::controls::ExposureTime);
+		auto exp = ctrls.get(libcamera::controls::ExposureTime);
 		if (exp)
 			exposure_time = *exp;
 
@@ -266,8 +309,8 @@ struct FrameInfo
 
 private:
 	// Info text tokens.
-	inline static const std::string tokens[] = { "%frame", "%fps", "%exp",	 "%ag",	   "%dg",
-												 "%rg",	   "%bg",  "%focus", "%aelock" };
+	inline static const std::string tokens[] = {"%frame", "%fps", "%exp", "%ag", "%dg",
+												"%rg", "%bg", "%focus", "%aelock"};
 };
 
 class Metadata

@@ -204,6 +204,10 @@ void *PiCamera::videoThreadFunc(void *p)
 
 
         CompletedRequestPtr payload = std::get<CompletedRequestPtr>(msg.payload);
+
+        // --- NEW: timesync processing ---
+        t->processTimesyncMetadata(payload);
+        
         mem = t->app->Mmap(payload->buffers[stream]);
         t->mtx.lock();
             memcpy(t->framebuffer,mem[0].data(),buffersize);
@@ -216,3 +220,35 @@ void *PiCamera::videoThreadFunc(void *p)
     }
     return NULL;
 }
+
+void PiCamera::processTimesyncMetadata(const CompletedRequestPtr &payload)
+{
+    // Extract metadata produced by LibcameraApp timesync
+    int64_t H_exp_ns = 0;
+    bool have_exp = (payload->post_process_metadata.Get<int64_t>(
+                         kMetaExposureHostSteadyNs, H_exp_ns) == 0);
+
+    bool ready = false;
+    (void)payload->post_process_metadata.Get<bool>(kMetaTimeSyncReady, ready);
+
+    int64_t mad_ns = 0;
+    (void)payload->post_process_metadata.Get<int64_t>(kMetaTimesyncMadNs, mad_ns);
+
+    int64_t offset_ns = 0;
+    (void)payload->post_process_metadata.Get<int64_t>(kMetaOffsetSensorToHostNs, offset_ns);
+
+    // Store diagnostics for outside users
+    timesync_ready.store(ready, std::memory_order_release);
+    timesync_mad_ns.store(mad_ns, std::memory_order_release);
+    timesync_offset_ns.store(offset_ns, std::memory_order_release);
+
+    // Exposure timestamp
+    if (have_exp && ready) {
+        // Best possible timestamp: host-steady midpoint-corrected exposure time
+        last_exposure_hoststeady_ns.store(H_exp_ns, std::memory_order_release);
+    } else {
+        // Fallback: monotonic now (still consistent, just less precise)
+        last_exposure_hoststeady_ns.store(now_steady_ns(), std::memory_order_release);
+    }
+}
+

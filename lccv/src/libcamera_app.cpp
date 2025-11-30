@@ -15,6 +15,10 @@ LibcameraApp::LibcameraApp(std::unique_ptr<Options> opts)
 	if (!options_)
 		options_ = std::make_unique<Options>();
 	controls_.clear();
+
+	// Initialize software timesync defaults.
+	cfg_ = TimeSyncConfig{};        // uses sensible defaults from timesync.hpp
+	sync_.configure(cfg_);
 }
 
 LibcameraApp::~LibcameraApp()
@@ -320,6 +324,11 @@ void LibcameraApp::queueRequest(CompletedRequest *completed_request)
 		request->controls() = std::move(controls_);
 	}
 
+	// --- Timesync: record host-steady queue time (Hq) per Request* ---
+	if (sw_timesync_enabled_)
+		host_queue_ns_[request] = now_steady_ns();
+	// ---
+
 	if (camera_->queueRequest(request) < 0)
 		throw std::runtime_error("failed to queue request");
 }
@@ -494,6 +503,28 @@ void LibcameraApp::requestComplete(Request *request)
 		std::lock_guard<std::mutex> lock(completed_requests_mutex_);
 		completed_requests_.insert(r);
 	}
+
+	// --- Timesync midpoint update ---
+    const int64_t Hc = now_steady_ns();
+    if (sw_timesync_enabled_) {
+        auto it = host_queue_ns_.find(request);
+        if (it != host_queue_ns_.end()) {
+            const int64_t Hq = it->second;
+            host_queue_ns_.erase(it);
+
+            if (auto Sopt = request->metadata().get(controls::SensorTimestamp)) {
+                const int64_t S = *Sopt;
+                sync_.update(Hq, Hc, S);
+                const int64_t H_exp_ns = sync_.sensor_to_host_steady(S);
+
+                payload->post_process_metadata.Set(kMetaExposureHostSteadyNs, H_exp_ns);
+                payload->post_process_metadata.Set(kMetaTimeSyncReady,        sync_.ready());
+                payload->post_process_metadata.Set(kMetaOffsetSensorToHostNs, (int64_t)sync_.offset_ns());
+                payload->post_process_metadata.Set(kMetaTimesyncMadNs,        (int64_t)sync_.median_abs_dev());
+            }
+        }
+    }
+    // --- end timesync ---
 
 	// We calculate the instantaneous framerate in case anyone wants it.
 	uint64_t timestamp = payload->buffers.begin()->second->metadata().timestamp;

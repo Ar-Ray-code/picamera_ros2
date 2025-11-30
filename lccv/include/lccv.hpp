@@ -50,11 +50,17 @@ public:
 
     bool hdrOpen(bool _hdr_flag);
 
+    std::atomic<int64_t> last_exposure_hoststeady_ns;
+    std::atomic<bool>    timesync_ready;
+    std::atomic<int64_t> timesync_mad_ns;
+    std::atomic<int64_t> timesync_offset_ns;
+
 protected:
     void run();
 protected:
     LibcameraApp *app;
     void getImage(cv::Mat &frame, CompletedRequestPtr &payload);
+    void processTimesyncMetadata(const CompletedRequestPtr &payload);
     static void *videoThreadFunc(void *p);
     pthread_t videothread;
     unsigned int still_flags;
